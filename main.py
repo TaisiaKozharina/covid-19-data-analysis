@@ -5,7 +5,7 @@ import os
 # Load environment variables from .env file
 load_dotenv()
 
-conn_params = {
+connection_params = {
     'user': os.getenv("SF_USER"),
     'password': os.getenv("SF_PASSWORD"),
     'account': os.getenv("SF_ACCOUNT"),
@@ -16,9 +16,10 @@ conn_params = {
 
 
 #Opening connection
-conn = snowflake.connector.connect(**conn_params)
+con = snowflake.connector.connect(**connection_params)
 
-cursor = conn.cursor()
+cursor = con.cursor()
+
 query = "SELECT COUNTRY_REGION, SUM(CASES) AS Cases FROM ECDC_GLOBAL GROUP BY COUNTRY_REGION"
 cursor.execute(query)
 
@@ -30,4 +31,4 @@ for row in results:
 
 #Closing connection
 cursor.close()
-conn.close()
+con.close()
