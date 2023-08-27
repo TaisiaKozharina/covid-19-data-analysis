@@ -2,7 +2,6 @@ import snowflake.connector
 from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 import os
-import json
 
 # Load environment variables from .env file
 load_dotenv()
@@ -19,14 +18,13 @@ connection_params = {
 
 app = Flask(__name__)
 
-@app.route('/get_data', methods=['GET'])
-def get_data__from_table():
+@app.route('/get_table_data', methods=['GET'])
+def get_data_from_table():
 
     #Opening connection
     con = snowflake.connector.connect(**connection_params)
     cursor = con.cursor()
 
-    # Get user input
     table_name = request.args.get('table')
 
     query = f"""
@@ -48,15 +46,40 @@ def get_data__from_table():
         data = cursor.fetchall()
         column_names = [desc[0] for desc in cursor.description]
 
-        response = {'data': [dict(zip(column_names, row)) for row in data], 'status': "OK"}
+        response = {'data': [dict(zip(column_names, row)) for row in data], 'comment': "OK"}
 
     else:
-        response={'data': [], "status": "NO SUCH TABLE"}
+        response={'data': [], "comment": "NO SUCH TABLE"}
+
+    con.close()
+    return jsonify(response)
+
+
+
+@app.route('/get_demographic_data', methods=['GET'])
+def get_demographic_data():
+
+    #Opening connection
+    con = snowflake.connector.connect(**connection_params)
+    cursor = con.cursor()
+
+    query = ""
+    cursor = con.cursor()
+    cursor.execute(query)
+
+    query = f"SELECT * from EXPOSURE_COUNTRY_INFO limit"
+    cursor.execute(query)
+
+    data = cursor.fetchall()
+    column_names = [desc[0] for desc in cursor.description]
+
+    response = {'data': [dict(zip(column_names, row)) for row in data], 'comment': "OK"}
+
+
 
     con.close()
 
     return jsonify(response)
-
 
 
 if __name__ == '__main__':
