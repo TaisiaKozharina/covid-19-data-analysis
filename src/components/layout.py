@@ -1,5 +1,5 @@
 from dash import Dash, html, dcc, callback
-from . import drop_down, barchart, demographics #components
+from . import demographics #components
 from dash.dependencies import Input, Output
 
 
@@ -28,10 +28,10 @@ def create_layout(app: Dash) -> html.Div:
               Input('tab-selection', 'value'))
 def render_tab_content(tab: str):
     if tab == 'tab1':
-        return html.Div([
+            return html.Div([
             demographics.render()
-
         ])
+
     elif tab == 'tab2':
         return html.Div([
             html.H3('Vaccination infographics in development'),
@@ -40,3 +40,4 @@ def render_tab_content(tab: str):
         return html.Div([
             html.H3('Infection rates in development'),
         ])
+    

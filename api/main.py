@@ -1,6 +1,7 @@
 import snowflake.connector
 from dotenv import load_dotenv
 from flask import Flask, request, jsonify
+from pymongo import MongoClient
 import os
 
 # Load environment variables from .env file
@@ -75,11 +76,42 @@ def get_demographic_data():
 
     response = {'data': [dict(zip(column_names, row)) for row in data], 'comment': "OK"}
 
-
-
     con.close()
 
     return jsonify(response)
+
+
+@app.route('/post_comment', methods=['POST'])
+def post_comment():
+    data = request.json
+
+    client = MongoClient()
+    db = client['covid19_meta']
+    collection = db['exposure_comments']
+    #data = {"name": "Alice", "age": 30}
+
+    inserted_id = collection.insert_one(data).inserted_id
+    print("Inserted data to MongoDB. Inserted ID: ", inserted_id)
+    
+    response_data = {"inserted_id": str(inserted_id)}  # Convert ObjectId to string
+    return jsonify(response_data)
+
+
+
+@app.route('/get_comment', methods=['GET'])
+def get_comment():
+        
+    country = request.args.get('country')
+
+    client = MongoClient()
+    db = client['covid19_meta']
+    collection = db['exposure_comments']
+
+
+    result = collection.find({"country": country})
+    for document in result:
+        print(document)
+
 
 
 if __name__ == '__main__':
@@ -87,6 +119,6 @@ if __name__ == '__main__':
         app.run(debug=True)
 
 
-#Closing connection
-cursor.close()
-con.close()
+# #Closing connection
+# cursor.close()
+# con.close()
