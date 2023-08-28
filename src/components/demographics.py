@@ -49,7 +49,7 @@ def getCommentsCountry(country: str):
             other_comment_div = html.Div(children=[
                 html.P("Someone has already refenced this coutry:"),
                 html.Ul(children=[html.Li(comment['comment']) for comment in response.json()])
-            ])
+            ], className="comment-list")
 
             return other_comment_div
         else:
@@ -90,15 +90,15 @@ def render():
             html.Div(children=[
                 dcc.Graph(figure=fig1, style={'display': 'inline-block'}, id="sc1"),
                 dcc.Graph(figure=fig2, style={'display': 'inline-block'}, id="sc2"),
-                html.Div(style={'width':'60%', 'display':'flex', 'flex-direction':'column'}, id="sc1_comment"),
-                html.Div(style={'width':'60%', 'display':'flex', 'flex-direction':'column'}, id="sc2_comment"),
-            ], style={'display': 'grid', 'grid-template-columns': '1fr 1fr', 'justify-items':'center', 'align-item':'center'}),
+                html.Div(id="sc1_comment", className="comment-box"),
+                html.Div(id="sc2_comment", className="comment-box"),
+            ], className="graph-grid"),
             html.Div(children=[
                 dcc.Graph(figure=fig3, style={'display': 'inline-block'}, id="sc3"),
                 dcc.Graph(figure=fig4, style={'display': 'inline-block'}, id="sc4"),
-                html.Div(style={'width':'60%', 'display':'flex', 'flex-direction':'column'}, id="sc3_comment"),
-                html.Div(style={'width':'60%', 'display':'flex', 'flex-direction':'column'}, id="sc4_comment"),
-            ], style={'display': 'grid', 'grid-template-columns': '1fr 1fr', 'justify-items':'center', 'align-item':'center'}),
+                html.Div(id="sc3_comment", className="comment-box"),
+                html.Div(id="sc4_comment", className="comment-box"),
+            ], className="graph-grid"),
 
 
             html.Div("", id='comment-saved'),
@@ -142,8 +142,8 @@ def display_click_data_s1(clickData):
         other_comments_div = html.Div()
         
     plch = f"Country {custom_data[0]} has Aid dependence of {custom_data[1]}. Want to comment on it?"
-    return [dcc.Textarea(placeholder=plch, style={'width':'60%'}, id="sc1_comment_text"),
-            html.Button("Submit", style={'width':'60%'}, id="sbt1", **{'data-args': f"{custom_data[0]}, aid_dependence,{custom_data[1]}"}),
+    return [dcc.Textarea(placeholder=plch, id="sc1_comment_text"),
+            html.Button("Submit", id="sbt1", className="btn", **{'data-args': f"{custom_data[0]}, aid_dependence,{custom_data[1]}"}),
             other_comments_div]
 
 @callback(
@@ -160,8 +160,8 @@ def display_click_data_s2(clickData):
         other_comments_div = html.Div()
 
     plch = f"Country {custom_data[0]} has Food import dependence of {custom_data[1]}. Want to comment on it?"
-    return [dcc.Textarea(placeholder=plch, style={'width':'60%'}, id="sc2_comment_text"),
-            html.Button("Submit", style={'width':'60%'}, id="sbt2", **{'data-args': f"[{custom_data[0]}, 'food_import_dependence',{custom_data[1]}]"}),
+    return [dcc.Textarea(placeholder=plch, id="sc2_comment_text"),
+            html.Button("Submit", className="btn", id="sbt2", **{'data-args': f"[{custom_data[0]}, 'food_import_dependence',{custom_data[1]}]"}),
             other_comments_div
             ]
 
@@ -180,8 +180,8 @@ def display_click_data_s3(clickData):
         other_comments_div = html.Div()
 
     plch = f"Country {custom_data[0]} has Prime commodity export dependence of {custom_data[1]}. Want to comment on it?"
-    return [dcc.Textarea(placeholder=plch, style={'width':'60%'}, id="sc3_comment_text"),
-            html.Button("Submit", style={'width':'60%'}, id="sbt3", **{'data-args': f"[{custom_data[0]}, 'prim_commodity_export_dependence',{custom_data[1]}]"}),
+    return [dcc.Textarea(placeholder=plch, id="sc3_comment_text"),
+            html.Button("Submit", className="btn", id="sbt3", **{'data-args': f"[{custom_data[0]}, 'prim_commodity_export_dependence',{custom_data[1]}]"}),
             other_comments_div
             ]
 
@@ -200,8 +200,8 @@ def display_click_data_s4(clickData):
         other_comments_div = html.Div()
 
     plch = f"Country {custom_data[0]} has Percentage of Government gross debt from GDP of {custom_data[1]}. Want to comment on it?"
-    return [dcc.Textarea(placeholder=plch, style={'width':'60%'}, id="sc4_comment_text"),
-            html.Button("Submit", id="sbt4", **{'data-args': f"{custom_data[0]}, govern_debt_from_GDP_perc_2019,{custom_data[1]}"}, style={'width':'60%'} ),
+    return [dcc.Textarea(placeholder=plch, id="sc4_comment_text"),
+            html.Button("Submit", id="sbt4",  className="btn", **{'data-args': f"{custom_data[0]}, govern_debt_from_GDP_perc_2019,{custom_data[1]}"}, style={'width':'60%'} ),
             other_comments_div
             ]
 

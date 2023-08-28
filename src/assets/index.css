@@ -1,0 +1,58 @@
+.app-div{
+    display: grid;
+    align-items: center;
+    justify-content: center;
+    padding: 3vh 3vw;
+}
+
+h1{
+    text-align: center;
+    font-weight: 600;
+}
+
+h3{
+    color: rgb(4, 56, 153);
+    padding: 20px 0;
+}
+
+
+.graph-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 2fr auto;
+    column-gap: 10px;
+    justify-items:center;
+    align-items: center;
+}
+
+textarea{
+    width: 100% !important;
+    height: 50px;
+    border-radius: 5px;
+    outline: none;
+    resize: none;
+}
+
+.btn{
+    background-color: rgb(4, 56, 153);
+    color: #fff;
+    padding: 5px;
+    border-radius: 5px;
+    margin-top: 5px;
+    width: 100%;
+}
+
+.comment-box{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 10%;
+    margin: 10px 0;
+    border-radius: 8px;
+    background-color: rgba(4, 71, 197, 0.281);
+}
+
+.comment-list{
+    color: #000;
+    margin-top: 10px;
+}

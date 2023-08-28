@@ -15,6 +15,7 @@ To develop a web-based interactive dashboard with useful information and infogra
 - `pip install python-dotenv`
 - `pip3 install requests`
 - `pip3 install dash-bootstrap-components`
+- `pip3 install Flask-Caching`
 - `pip3 install pymongo`
 
   Note: Snowpark API requires Python 3.8+

@@ -1,9 +1,11 @@
 import snowflake.connector
 from dotenv import load_dotenv
 from flask import Flask, request, jsonify
+from flask_caching import Cache
 from pymongo import MongoClient
 import os
 from bson.json_util import dumps
+
 
 # Load environment variables from .env file
 load_dotenv()
@@ -18,7 +20,16 @@ connection_params = {
 }
 
 
+cache_config = {
+    "DEBUG": True,          
+    "CACHE_TYPE": "SimpleCache",
+    "CACHE_DEFAULT_TIMEOUT": 300
+}
+
 app = Flask(__name__)
+
+app.config.from_mapping(cache_config)
+cache = Cache(app)
 
 @app.route('/get_table_data', methods=['GET'])
 def get_data_from_table():
@@ -59,17 +70,44 @@ def get_data_from_table():
 
 
 @app.route('/get_demographic_data', methods=['GET'])
+@cache.cached(timeout=3000)
 def get_demographic_data():
 
     #Opening connection
     con = snowflake.connector.connect(**connection_params)
     cursor = con.cursor()
 
-    query = ""
-    cursor = con.cursor()
+    query = "USE ROLE ACCOUNTADMIN"
     cursor.execute(query)
 
-    query = f"SELECT * from EXPOSURE_COUNTRY_INFO limit"
+
+    query = f"SELECT * from EXPOSURE_COUNTRY_INFO"
+    cursor.execute(query)
+
+    data = cursor.fetchall()
+    column_names = [desc[0] for desc in cursor.description]
+
+    response = {'data': [dict(zip(column_names, row)) for row in data], 'comment': "OK"}
+
+    con.close()
+
+    return jsonify(response)
+
+
+@app.route('/get_vaccination_data', methods=['GET'])
+@cache.cached(timeout=3000)
+def get_vaccination_data():
+
+    #Opening connection
+    con = snowflake.connector.connect(**connection_params)
+    cursor = con.cursor()
+
+    query = "USE ROLE ACCOUNTADMIN"
+    cursor.execute(query)
+
+    query = f'''select o.date, o.total_vaccinations as "TOTAL_VACCINATED", o.daily_vaccinations as "DAILY_VACCINATED",
+                o.people_fully_vaccinated as "FULLY_VACCINATED", o.country_region, o.iso3166_1, o.country_region
+                from OWID_VACCINATIONS o'''
     cursor.execute(query)
 
     data = cursor.fetchall()
@@ -89,12 +127,11 @@ def post_comment():
     client = MongoClient()
     db = client['covid19_meta']
     collection = db['exposure_comments']
-    #data = {"name": "Alice", "age": 30}
 
     inserted_id = collection.insert_one(data).inserted_id
     print("Inserted data to MongoDB. Inserted ID: ", inserted_id)
     
-    response_data = {"inserted_id": str(inserted_id)}  # Convert ObjectId to string
+    response_data = {"inserted_id": str(inserted_id)}
     return jsonify(response_data)
 
 
