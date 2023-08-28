@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 from pymongo import MongoClient
 import os
+from bson.json_util import dumps
 
 # Load environment variables from .env file
 load_dotenv()
@@ -100,7 +101,7 @@ def post_comment():
 
 @app.route('/get_comment', methods=['GET'])
 def get_comment():
-        
+
     country = request.args.get('country')
 
     client = MongoClient()
@@ -108,17 +109,14 @@ def get_comment():
     collection = db['exposure_comments']
 
 
-    result = collection.find({"country": country})
-    for document in result:
-        print(document)
+    result = list(collection.find({"country": country}))
+    print(result)
+
+    return dumps(result)
+
 
 
 
 if __name__ == '__main__':
     with app.app_context():
         app.run(debug=True)
-
-
-# #Closing connection
-# cursor.close()
-# con.close()

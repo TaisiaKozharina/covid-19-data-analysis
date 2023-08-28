@@ -29,13 +29,35 @@ def postComment(country: str, other_key: str, other_value: str, comment: str):
         **{other_key: other_value},
         "comment": comment
     }
-
-    print("Data passed to API: ", data)
     
     response = requests.post(api_url, json=data)
-    #print(response.content)
-
     return response.json()['inserted_id']
+
+
+def getCommentsCountry(country: str):
+    api_url = 'http://localhost:5000/get_comment' 
+
+    params = {
+        'country': country
+    }
+
+    response = requests.get(api_url, params=params)
+
+    if response.status_code == 200:
+        if len(response.json()) != 0:
+
+            other_comment_div = html.Div(children=[
+                html.P("Someone has already refenced this coutry:"),
+                html.Ul(children=[html.Li(comment['comment']) for comment in response.json()])
+            ])
+
+            return other_comment_div
+        else:
+            return "No matches"
+        
+    else:
+       return "Error fetching data"
+
 
 
 def render():
@@ -110,13 +132,19 @@ def render():
     Output('sc1_comment', 'children', allow_duplicate=True),
     Input('sc1', 'clickData'),
     prevent_initial_call=True)
-def display_click_data_s1(clickData):
+def display_click_data_s1(clickData):  
     if not clickData:
         return
     custom_data = clickData['points'][0]['customdata']
+
+    other_comments_div = getCommentsCountry(custom_data[0])
+    if type(other_comments_div) == str:
+        other_comments_div = html.Div()
+        
     plch = f"Country {custom_data[0]} has Aid dependence of {custom_data[1]}. Want to comment on it?"
     return [dcc.Textarea(placeholder=plch, style={'width':'60%'}, id="sc1_comment_text"),
-            html.Button("Submit", style={'width':'60%'}, id="sbt1", **{'data-args': f"{custom_data[0]}, aid_dependence,{custom_data[1]}"})]
+            html.Button("Submit", style={'width':'60%'}, id="sbt1", **{'data-args': f"{custom_data[0]}, aid_dependence,{custom_data[1]}"}),
+            other_comments_div]
 
 @callback(
     Output('sc2_comment', 'children',allow_duplicate=True),
@@ -126,9 +154,16 @@ def display_click_data_s2(clickData):
     if not clickData:
         return
     custom_data = clickData['points'][0]['customdata']
+
+    other_comments_div = getCommentsCountry(custom_data[0])
+    if type(other_comments_div) == str:
+        other_comments_div = html.Div()
+
     plch = f"Country {custom_data[0]} has Food import dependence of {custom_data[1]}. Want to comment on it?"
     return [dcc.Textarea(placeholder=plch, style={'width':'60%'}, id="sc2_comment_text"),
-            html.Button("Submit", style={'width':'60%'}, id="sbt2", **{'data-args': f"[{custom_data[0]}, 'food_import_dependence',{custom_data[1]}]"})]
+            html.Button("Submit", style={'width':'60%'}, id="sbt2", **{'data-args': f"[{custom_data[0]}, 'food_import_dependence',{custom_data[1]}]"}),
+            other_comments_div
+            ]
 
 
 @callback(
@@ -139,9 +174,16 @@ def display_click_data_s3(clickData):
     if not clickData:
         return
     custom_data = clickData['points'][0]['customdata']
+
+    other_comments_div = getCommentsCountry(custom_data[0])
+    if type(other_comments_div) == str:
+        other_comments_div = html.Div()
+
     plch = f"Country {custom_data[0]} has Prime commodity export dependence of {custom_data[1]}. Want to comment on it?"
     return [dcc.Textarea(placeholder=plch, style={'width':'60%'}, id="sc3_comment_text"),
-            html.Button("Submit", style={'width':'60%'}, id="sbt3", **{'data-args': f"[{custom_data[0]}, 'prim_commodity_export_dependence',{custom_data[1]}]"})]
+            html.Button("Submit", style={'width':'60%'}, id="sbt3", **{'data-args': f"[{custom_data[0]}, 'prim_commodity_export_dependence',{custom_data[1]}]"}),
+            other_comments_div
+            ]
 
 
 @callback(
@@ -152,12 +194,19 @@ def display_click_data_s4(clickData):
     if not clickData:
         return
     custom_data = clickData['points'][0]['customdata']
+
+    other_comments_div = getCommentsCountry(custom_data[0])
+    if type(other_comments_div) == str:
+        other_comments_div = html.Div()
+
     plch = f"Country {custom_data[0]} has Percentage of Government gross debt from GDP of {custom_data[1]}. Want to comment on it?"
     return [dcc.Textarea(placeholder=plch, style={'width':'60%'}, id="sc4_comment_text"),
-            html.Button("Submit", id="sbt4", **{'data-args': f"{custom_data[0]}, govern_debt_from_GDP_perc_2019,{custom_data[1]}"}, style={'width':'60%'} )]
+            html.Button("Submit", id="sbt4", **{'data-args': f"{custom_data[0]}, govern_debt_from_GDP_perc_2019,{custom_data[1]}"}, style={'width':'60%'} ),
+            other_comments_div
+            ]
 
 
-# HANDLING SUMITTING THE COMMENT ON DATAPOINT
+# HANDLING SUBMITTING THE COMMENT ON DATAPOINT
 
 @callback(
     Output('sc1_comment', 'children'),
